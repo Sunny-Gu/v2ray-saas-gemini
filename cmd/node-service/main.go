@@ -1,23 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"os"
+	"v2ray-saas-gemini/internal/config"
+	"v2ray-saas-gemini/internal/database"
+	"v2ray-saas-gemini/internal/node/router"
 )
 
 func main() {
-	// A simple handler function
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to the Node Service!")
-	})
+	// Initialize configuration
+	config.Init()
 
-	// Define the server address
-	addr := ":8082"
+	// Initialize database
+	os.Setenv("DB_DSN", config.Cfg.Database.DSN)
+	database.Init()
+
+	// Setup the router
+	r := router.SetupRouter()
+
+	// Get server address from config
+	addr := config.Cfg.Server.NodeServicePort
 	log.Printf("Node Service server starting on %s", addr)
 
 	// Start the server
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := r.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

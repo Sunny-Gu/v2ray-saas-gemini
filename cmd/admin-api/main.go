@@ -1,23 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"os"
+	"v2ray-saas-gemini/internal/admin/router"
+	"v2ray-saas-gemini/internal/config"
+	"v2ray-saas-gemini/internal/database"
 )
 
 func main() {
-	// A simple handler function
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to the Admin API!")
-	})
+	// Initialize configuration
+	config.Init()
 
-	// Define the server address
-	addr := ":8081"
+	// Initialize database
+	os.Setenv("DB_DSN", config.Cfg.Database.DSN)
+	database.Init()
+
+	// Setup the router
+	r := router.SetupRouter()
+
+	// Get server address from config
+	addr := config.Cfg.Server.AdminAPIPort
 	log.Printf("Admin API server starting on %s", addr)
 
 	// Start the server
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := r.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
