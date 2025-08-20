@@ -49,3 +49,34 @@ func (s *UserService) Register(input RegisterUserInput) (*models.User, error) {
 
 	return &newUser, nil
 }
+
+// LoginUserInput defines the input for the user login.
+type LoginUserInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+// Login handles the user login process and returns a JWT upon success.
+func (s *UserService) Login(input LoginUserInput) (string, error) {
+	// Find the user by email
+	var user models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("invalid email or password")
+		}
+		return "", err
+	}
+
+	// Check the password
+	if !utils.CheckPasswordHash(input.Password, user.PasswordHash) {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Generate JWT
+	token, err := utils.GenerateJWT(user.ID, user.Email)
+	if err != nil {
+		return "", errors.New("failed to generate token")
+	}
+
+	return token, nil
+}

@@ -41,3 +41,26 @@ func (h *UserHandler) Register(c *gin.Context) {
 		"user_id": user.ID,
 	})
 }
+
+// Login handles the user login request.
+func (h *UserHandler) Login(c *gin.Context) {
+	var input service.LoginUserInput
+	// Bind and validate the input
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the login service
+	token, err := h.userService.Login(input)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Respond with the token
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"token":   token,
+	})
+}

@@ -29,10 +29,7 @@ func SetupRouter() *gin.Engine {
 		userRoutes := apiV1.Group("/user")
 		{
 			userRoutes.POST("/register", userHandler.Register)
-			// Placeholder for user login
-			userRoutes.POST("/login", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{"message": "login endpoint"})
-			})
+			userRoutes.POST("/login", userHandler.Login)
 		}
 	}
 
