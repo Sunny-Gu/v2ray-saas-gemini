@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 	"v2ray-saas-gemini/internal/admin/handler"
+	"v2ray-saas-gemini/internal/admin/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,7 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	// Handlers
+	authHandler := handler.NewAuthHandler()
 	nodeHandler := handler.NewNodeHandler()
 	rechargeConfigHandler := handler.NewRechargeConfigHandler()
 	userManagementHandler := handler.NewUserManagementHandler()
@@ -19,50 +21,63 @@ func SetupRouter() *gin.Engine {
 
 	// API v1 group for admin
 	apiV1 := router.Group("/api/v1/admin")
-	// TODO: Add admin-specific authentication middleware
-	// apiV1.Use(middleware.AdminAuthMiddleware())
 	{
-		// Health check for admin
-		apiV1.GET("/ping", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "pong from admin",
+		// Public route for login
+		apiV1.POST("/login", authHandler.Login)
+
+		// Authenticated routes
+		authRequired := apiV1.Group("/")
+		authRequired.Use(middleware.AdminAuthMiddleware())
+		{
+			// Health check for admin
+			authRequired.GET("/ping", func(c *gin.Context) {
+				c.JSON(http.StatusOK, gin.H{
+					"message": "pong from admin",
+				})
 			})
-		})
 
-		// Node management routes
-		nodeRoutes := apiV1.Group("/nodes")
-		{
-			nodeRoutes.POST("/", nodeHandler.CreateNode)
-			nodeRoutes.GET("/", nodeHandler.ListNodes)
-			nodeRoutes.GET("/:id", nodeHandler.GetNode)
-			nodeRoutes.PUT("/:id", nodeHandler.UpdateNode)
-			nodeRoutes.DELETE("/:id", nodeHandler.DeleteNode)
-		}
+			// Node management routes
+			nodeRoutes := authRequired.Group("/nodes")
+			{
+				nodeRoutes.POST("/", nodeHandler.CreateNode)
+				nodeRoutes.GET("/", nodeHandler.ListNodes)
+				nodeRoutes.GET("/:id", nodeHandler.GetNode)
+				nodeRoutes.PUT("/:id", nodeHandler.UpdateNode)
+				nodeRoutes.DELETE("/:id", nodeHandler.DeleteNode)
+			}
 
-		// Recharge preset management routes
-		rechargeRoutes := apiV1.Group("/recharge-presets")
-		{
-			rechargeRoutes.POST("/", rechargeConfigHandler.CreatePreset)
-			rechargeRoutes.GET("/", rechargeConfigHandler.ListPresets)
-			rechargeRoutes.PUT("/:id", rechargeConfigHandler.UpdatePreset)
-			rechargeRoutes.DELETE("/:id", rechargeConfigHandler.DeletePreset)
-		}
+			// Recharge preset management routes
+			rechargeRoutes := authRequired.Group("/recharge-presets")
+			{
+				rechargeRoutes.POST("/", rechargeConfigHandler.CreatePreset)
+				rechargeRoutes.GET("/", rechargeConfigHandler.ListPresets)
+				rechargeRoutes.PUT("/:id", rechargeConfigHandler.UpdatePreset)
+				rechargeRoutes.DELETE("/:id", rechargeConfigHandler.DeletePreset)
+			}
 
-		// User management routes
-		userRoutes := apiV1.Group("/users")
-		{
-			userRoutes.GET("/", userManagementHandler.ListUsers)
-			userRoutes.PATCH("/:id/status", userManagementHandler.UpdateUserStatus)
-		}
+			// User management routes
+			userRoutes := authRequired.Group("/users")
+			{
+				userRoutes.GET("/", userManagementHandler.ListUsers)
+				userRoutes.PATCH("/:id/status", userManagementHandler.UpdateUserStatus)
+			}
 
-		// Plan management routes
-		planRoutes := apiV1.Group("/plans")
-		{
-			planRoutes.POST("/", planManagementHandler.CreatePlan)
-			planRoutes.GET("/", planManagementHandler.ListPlans)
-			planRoutes.GET("/:id", planManagementHandler.GetPlan)
-			planRoutes.PUT("/:id", planManagementHandler.UpdatePlan)
-			planRoutes.DELETE("/:id", planManagementHandler.DeletePlan)
+			// Plan management routes
+			planRoutes := authRequired.Group("/plans")
+			{
+				planRoutes.POST("/", planManagementHandler.CreatePlan)
+				planRoutes.GET("/", planManagementHandler.ListPlans)
+				planRoutes.GET("/:id", planManagementHandler.GetPlan)
+				planRoutes.PUT("/:id", planManagementHandler.UpdatePlan)
+				planRoutes.DELETE("/:id", planManagementHandler.DeletePlan)
+			}
+
+			// Order management routes
+			orderRoutes := authRequired.Group("/orders")
+			{
+				orderRoutes.GET("/recharge", orderHandler.ListRechargeOrders)
+				orderRoutes.GET("/subscription", orderHandler.ListSubscriptionOrders)
+			}
 		}
 	}
 

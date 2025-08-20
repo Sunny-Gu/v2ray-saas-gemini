@@ -48,6 +48,7 @@ func Init() {
 		&models.TicketReply{},
 		&models.Announcement{},
 		&models.HelpDocument{},
+		&models.Admin{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database schema: %v", err)
