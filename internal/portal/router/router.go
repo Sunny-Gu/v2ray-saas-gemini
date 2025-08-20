@@ -20,6 +20,7 @@ func SetupRouter() *gin.Engine {
 	// Handlers
 	userHandler := handler.NewUserHandler()
 	profileHandler := handler.NewProfileHandler()
+	rechargeHandler := handler.NewRechargeHandler()
 
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -39,6 +40,12 @@ func SetupRouter() *gin.Engine {
 			profileRoutes := authenticated.Group("/profile")
 			{
 				profileRoutes.GET("/", profileHandler.GetProfile)
+			}
+
+			// Recharge routes
+			rechargeRoutes := authenticated.Group("/recharge")
+			{
+				rechargeRoutes.POST("/redeem", rechargeHandler.RedeemCoupon)
 			}
 		}
 	}
