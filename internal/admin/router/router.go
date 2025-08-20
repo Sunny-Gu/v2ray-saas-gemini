@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"v2ray-saas-gemini/internal/admin/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,9 +11,12 @@ import (
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
+	// Handlers
+	nodeHandler := handler.NewNodeHandler()
+
 	// API v1 group for admin
 	apiV1 := router.Group("/api/v1/admin")
-	// Here we would add an admin-specific authentication middleware
+	// TODO: Add admin-specific authentication middleware
 	// apiV1.Use(middleware.AdminAuthMiddleware())
 	{
 		// Health check for admin
@@ -22,8 +26,15 @@ func SetupRouter() *gin.Engine {
 			})
 		})
 
-		// Placeholder for other admin routes
-		// e.g., apiV1.GET("/users", userHandler.GetUsers)
+		// Node management routes
+		nodeRoutes := apiV1.Group("/nodes")
+		{
+			nodeRoutes.POST("/", nodeHandler.CreateNode)
+			nodeRoutes.GET("/", nodeHandler.ListNodes)
+			nodeRoutes.GET("/:id", nodeHandler.GetNode)
+			nodeRoutes.PUT("/:id", nodeHandler.UpdateNode)
+			nodeRoutes.DELETE("/:id", nodeHandler.DeleteNode)
+		}
 	}
 
 	return router
