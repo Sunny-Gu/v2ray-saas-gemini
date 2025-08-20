@@ -21,15 +21,23 @@ func SetupRouter() *gin.Engine {
 	userHandler := handler.NewUserHandler()
 	profileHandler := handler.NewProfileHandler()
 	rechargeHandler := handler.NewRechargeHandler()
+	storeHandler := handler.NewStoreHandler()
 
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
 	{
-		// Public routes (no authentication required)
-		public := apiV1.Group("/user")
+		// Public routes
+		public := apiV1.Group("/")
 		{
-			public.POST("/register", userHandler.Register)
-			public.POST("/login", userHandler.Login)
+			userRoutes := public.Group("/user")
+			{
+				userRoutes.POST("/register", userHandler.Register)
+				userRoutes.POST("/login", userHandler.Login)
+			}
+			storeRoutes := public.Group("/store")
+			{
+				storeRoutes.GET("/plans", storeHandler.ListPlans)
+			}
 		}
 
 		// Authenticated routes
@@ -46,6 +54,12 @@ func SetupRouter() *gin.Engine {
 			rechargeRoutes := authenticated.Group("/recharge")
 			{
 				rechargeRoutes.POST("/redeem", rechargeHandler.RedeemCoupon)
+			}
+
+			// Store routes (for purchasing)
+			storeRoutes := authenticated.Group("/store")
+			{
+				storeRoutes.POST("/purchase", storeHandler.PurchasePlan)
 			}
 		}
 	}
