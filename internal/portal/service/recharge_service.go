@@ -127,3 +127,50 @@ func (s *RechargeService) CreateUSDTOrder(userID uint, input CreateUSDTOrderInpu
 
 	return &order, nil
 }
+
+// GenerateCouponInput defines the input for a user generating a coupon.
+type GenerateCouponInput struct {
+	Value float64 `json:"value" binding:"required,gt=0"`
+}
+
+// GenerateCoupon allows a user to generate a recharge code from their balance.
+func (s *RechargeService) GenerateCoupon(userID uint, input GenerateCouponInput) (*models.Coupon, error) {
+	tx := database.DB.Begin()
+	if tx.Error != nil {
+		return nil, errors.New("failed to start transaction")
+	}
+
+	var balance models.Balance
+	if err := tx.Set("gorm:query_option", "FOR UPDATE").Where("user_id = ?", userID).First(&balance).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("user balance not found")
+	}
+
+	if balance.CurrentBalance < input.Value {
+		tx.Rollback()
+		return nil, errors.New("insufficient balance")
+	}
+
+	balance.CurrentBalance -= input.Value
+	if err := tx.Save(&balance).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("failed to update balance")
+	}
+
+	newCoupon := models.Coupon{
+		Code:        "U" + uuid.New().String(), // Prefix with 'U' for user-generated
+		Value:       input.Value,
+		Status:      models.CouponStatusActive,
+		GeneratedBy: userID,
+	}
+	if err := tx.Create(&newCoupon).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("failed to create coupon")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, errors.New("failed to commit transaction")
+	}
+
+	return &newCoupon, nil
+}

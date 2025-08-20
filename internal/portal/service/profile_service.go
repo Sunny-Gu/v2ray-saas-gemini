@@ -53,3 +53,13 @@ func (s *ProfileService) GetProfileData(userID uint) (*GetProfileDataOutput, err
 
 	return output, nil
 }
+
+// GetConsumptionHistory retrieves a list of subscription orders for a user.
+func (s *ProfileService) GetConsumptionHistory(userID uint) ([]models.SubscriptionOrder, error) {
+	var orders []models.SubscriptionOrder
+	err := database.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&orders).Error
+	if err != nil {
+		return nil, errors.New("failed to retrieve consumption history")
+	}
+	return orders, nil
+}

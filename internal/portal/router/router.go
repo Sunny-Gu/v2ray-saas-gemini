@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 	profileHandler := handler.NewProfileHandler()
 	rechargeHandler := handler.NewRechargeHandler()
 	storeHandler := handler.NewStoreHandler()
+	subscriptionHandler := handler.NewSubscriptionHandler()
 
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -33,6 +34,8 @@ func SetupRouter() *gin.Engine {
 			{
 				userRoutes.POST("/register", userHandler.Register)
 				userRoutes.POST("/login", userHandler.Login)
+				userRoutes.POST("/request-password-reset", userHandler.RequestPasswordReset)
+				userRoutes.POST("/reset-password", userHandler.ResetPassword)
 			}
 			storeRoutes := public.Group("/store")
 			{
@@ -49,6 +52,7 @@ func SetupRouter() *gin.Engine {
 			profileRoutes := authenticated.Group("/profile")
 			{
 				profileRoutes.GET("/", profileHandler.GetProfile)
+				profileRoutes.GET("/history", profileHandler.GetConsumptionHistory)
 			}
 
 			// Recharge routes
@@ -56,12 +60,20 @@ func SetupRouter() *gin.Engine {
 			{
 				rechargeRoutes.POST("/redeem", rechargeHandler.RedeemCoupon)
 				rechargeRoutes.POST("/create-order", rechargeHandler.CreateUSDTOrder)
+				rechargeRoutes.POST("/generate-coupon", rechargeHandler.GenerateCoupon)
 			}
 
 			// Store routes (for purchasing)
 			storeRoutes := authenticated.Group("/store")
 			{
 				storeRoutes.POST("/purchase", storeHandler.PurchasePlan)
+			}
+
+			// Subscription routes
+			subscriptionRoutes := authenticated.Group("/subscription")
+			{
+				subscriptionRoutes.GET("/", subscriptionHandler.GetSubscriptionInfo)
+				subscriptionRoutes.POST("/reset-link", subscriptionHandler.ResetSubscriptionLink)
 			}
 		}
 	}

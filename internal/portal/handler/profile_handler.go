@@ -44,3 +44,16 @@ func (h *ProfileHandler) GetProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, profileData)
 }
+
+// GetConsumptionHistory handles the request to get the user's consumption history.
+func (h *ProfileHandler) GetConsumptionHistory(c *gin.Context) {
+	userID, _ := c.Get("userID")
+	id, _ := userID.(uint)
+
+	history, err := h.profileService.GetConsumptionHistory(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, history)
+}

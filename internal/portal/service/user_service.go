@@ -80,3 +80,70 @@ func (s *UserService) Login(input LoginUserInput) (string, error) {
 
 	return token, nil
 }
+
+// RequestPasswordResetInput defines the input for requesting a password reset.
+type RequestPasswordResetInput struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+// RequestPasswordReset generates a password reset token for a user.
+// In a real application, this would also trigger an email.
+func (s *UserService) RequestPasswordReset(input RequestPasswordResetInput) (string, error) {
+	var user models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		// Do not reveal if the user exists or not for security reasons.
+		return "", nil
+	}
+
+	// Generate a unique token
+	token := uuid.New().String()
+	expiresAt := time.Now().Add(1 * time.Hour) // Token valid for 1 hour
+
+	resetToken := models.PasswordResetToken{
+		UserID:    user.ID,
+		Token:     token,
+		ExpiresAt: expiresAt,
+	}
+
+	if err := database.DB.Create(&resetToken).Error; err != nil {
+		return "", errors.New("failed to create reset token")
+	}
+
+	// In a real app, you would send an email with the token here.
+	// For now, we return the token directly for testing purposes.
+	return token, nil
+}
+
+// ResetPasswordInput defines the input for resetting a password.
+type ResetPasswordInput struct {
+	Token       string `json:"token" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=8"`
+}
+
+// ResetPassword validates the token and resets the user's password.
+func (s *UserService) ResetPassword(input ResetPasswordInput) error {
+	var resetToken models.PasswordResetToken
+	if err := database.DB.Where("token = ? AND expires_at > ?", input.Token, time.Now()).First(&resetToken).Error; err != nil {
+		return errors.New("invalid or expired token")
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, resetToken.UserID).Error; err != nil {
+		return errors.New("user not found")
+	}
+
+	hashedPassword, err := utils.HashPassword(input.NewPassword)
+	if err != nil {
+		return errors.New("failed to hash new password")
+	}
+
+	user.PasswordHash = hashedPassword
+	if err := database.DB.Save(&user).Error; err != nil {
+		return errors.New("failed to update password")
+	}
+
+	// Invalidate the token after use
+	database.DB.Delete(&resetToken)
+
+	return nil
+}

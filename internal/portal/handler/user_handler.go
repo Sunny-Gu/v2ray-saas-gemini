@@ -64,3 +64,39 @@ func (h *UserHandler) Login(c *gin.Context) {
 		"token":   token,
 	})
 }
+
+// RequestPasswordReset handles the request to initiate a password reset.
+func (h *UserHandler) RequestPasswordReset(c *gin.Context) {
+	var input service.RequestPasswordResetInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// The service returns an error only on internal failures.
+	// It returns (token, nil) on success and ("", nil) if user not found.
+	// This prevents email enumeration.
+	_, err := h.userService.RequestPasswordReset(input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "If an account with that email exists, a password reset link has been sent."})
+}
+
+// ResetPassword handles the request to reset a password using a token.
+func (h *UserHandler) ResetPassword(c *gin.Context) {
+	var input service.ResetPasswordInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.userService.ResetPassword(input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password has been reset successfully."})
+}

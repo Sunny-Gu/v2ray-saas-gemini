@@ -73,3 +73,23 @@ func (h *RechargeHandler) CreateUSDTOrder(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, order)
 }
+
+// GenerateCoupon handles the request for a user to generate a coupon.
+func (h *RechargeHandler) GenerateCoupon(c *gin.Context) {
+	var input service.GenerateCouponInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, _ := c.Get("userID")
+	id, _ := userID.(uint)
+
+	coupon, err := h.rechargeService.GenerateCoupon(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, coupon)
+}
