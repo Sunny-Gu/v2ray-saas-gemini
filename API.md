@@ -1,36 +1,36 @@
-# API Documentation
+# API 文档
 
-This document provides a detailed description of the API endpoints for the V2Ray SaaS platform.
+本文档详细描述了 V2Ray SaaS 平台的 API 接口。
 
-**Base URL**: `http://localhost:<PORT>`
+**基础 URL**: `http://localhost:<PORT>`
 
-- **Portal API Port**: `8080`
-- **Admin API Port**: `8081`
+- **门户 API 端口**: `8080`
+- **后台管理 API 端口**: `8081`
 
 ---
 
-## Portal API (`portal-api`)
+## 门户 API (`portal-api`)
 
-All portal API endpoints are prefixed with `/api/v1`.
+所有门户 API 接口均以 `/api/v1` 为前缀。
 
-### Authentication
+### 认证
 
-- **Public Routes**: Accessible by anyone.
-- **Authenticated Routes**: Require a `Bearer Token` in the `Authorization` header.
+- **公开路由**: 无需认证即可访问。
+- **认证路由**: 需要在 `Authorization` 请求头中提供 `Bearer Token`。
 
-### User Management (`/user`)
+### 用户管理 (`/user`)
 
 #### **`POST /user/register`**
-- **Description**: Registers a new user.
-- **Auth**: Public
-- **Request Body**:
+- **描述**: 注册一个新用户。
+- **认证**: 公开
+- **请求体**:
   ```json
   {
     "email": "user@example.com",
     "password": "password123"
   }
   ```
-- **Success Response (201)**:
+- **成功响应 (201)**:
   ```json
   {
     "message": "User registered successfully",
@@ -39,16 +39,16 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /user/login`**
-- **Description**: Logs in a user and returns a JWT.
-- **Auth**: Public
-- **Request Body**:
+- **描述**: 用户登录并返回 JWT。
+- **认证**: 公开
+- **请求体**:
   ```json
   {
     "email": "user@example.com",
     "password": "password123"
   }
   ```
-- **Success Response (200)**:
+- **成功响应 (200)**:
   ```json
   {
     "message": "Login successful",
@@ -57,15 +57,15 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /user/request-password-reset`**
-- **Description**: Initiates the password reset process for a user.
-- **Auth**: Public
-- **Request Body**:
+- **描述**: 为用户发起密码重置流程。
+- **认证**: 公开
+- **请求体**:
   ```json
   {
     "email": "user@example.com"
   }
   ```
-- **Success Response (200)**:
+- **成功响应 (200)**:
   ```json
   {
     "message": "If an account with that email exists, a password reset link has been sent."
@@ -73,33 +73,33 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /user/reset-password`**
-- **Description**: Resets the user's password using a valid token.
-- **Auth**: Public
-- **Request Body**:
+- **描述**: 使用有效的令牌重置用户密码。
+- **认证**: 公开
+- **请求体**:
   ```json
   {
     "token": "valid-reset-token",
     "new_password": "newStrongPassword123"
   }
   ```
-- **Success Response (200)**:
+- **成功响应 (200)**:
   ```json
   {
     "message": "Password has been reset successfully."
   }
   ```
 
-### Profile (`/profile`)
+### 个人中心 (`/profile`)
 
 #### **`GET /profile/`**
-- **Description**: Retrieves the authenticated user's profile information.
-- **Auth**: Required
-- **Success Response (200)**:
+- **描述**: 获取当前认证用户的个人信息。
+- **认证**: 需要
+- **成功响应 (200)**:
   ```json
   {
     "email": "user@example.com",
     "balance": 100.50,
-    "plan_name": "Basic Plan",
+    "plan_name": "基础套餐",
     "plan_expiry_date": "2025-12-31",
     "used_traffic_gb": 50.5,
     "total_traffic_gb": 200.0
@@ -107,9 +107,9 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`GET /profile/history`**
-- **Description**: Retrieves the user's consumption history (subscription orders).
-- **Auth**: Required
-- **Success Response (200)**:
+- **描述**: 获取用户的消费历史（订阅订单）。
+- **认证**: 需要
+- **成功响应 (200)**:
   ```json
   [
     {
@@ -124,18 +124,18 @@ All portal API endpoints are prefixed with `/api/v1`.
   ]
   ```
 
-### Store & Subscription (`/store`, `/subscription`)
+### 商店与订阅 (`/store`, `/subscription`)
 
 #### **`GET /store/plans`**
-- **Description**: Lists all available service plans.
-- **Auth**: Public
-- **Success Response (200)**:
+- **描述**: 列出所有可购买的套餐计划。
+- **认证**: 公开
+- **成功响应 (200)**:
   ```json
   [
     {
       "ID": 1,
-      "Name": "Basic Plan",
-      "Description": "A great starting plan.",
+      "Name": "基础套餐",
+      "Description": "一个非常棒的入门套餐。",
       "Price": 50.0,
       "TrafficGB": 200.0,
       "DurationDays": 30,
@@ -146,15 +146,15 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /store/purchase`**
-- **Description**: Purchases a plan using the user's balance.
-- **Auth**: Required
-- **Request Body**:
+- **描述**: 使用账户余额购买一个套餐。
+- **认证**: 需要
+- **请求体**:
   ```json
   {
     "plan_id": 1
   }
   ```
-- **Success Response (201)**:
+- **成功响应 (201)**:
   ```json
   {
     "message": "Plan purchased successfully",
@@ -163,9 +163,9 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`GET /subscription/`**
-- **Description**: Retrieves the user's active subscription details.
-- **Auth**: Required
-- **Success Response (200)**:
+- **描述**: 获取用户当前有效的订阅详情。
+- **认证**: 需要
+- **成功响应 (200)**:
   ```json
   {
     "ID": 1,
@@ -179,9 +179,9 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /subscription/reset-link`**
-- **Description**: Resets the user's subscription link.
-- **Auth**: Required
-- **Success Response (200)**:
+- **描述**: 重置用户的订阅链接。
+- **认证**: 需要
+- **成功响应 (200)**:
   ```json
   {
     "message": "Subscription link reset successfully",
@@ -189,33 +189,33 @@ All portal API endpoints are prefixed with `/api/v1`.
   }
   ```
 
-### Recharge (`/recharge`)
+### 充值 (`/recharge`)
 
 #### **`GET /store/recharge-presets`**
-- **Description**: Lists all available recharge options.
-- **Auth**: Public
-- **Success Response (200)**:
+- **描述**: 列出所有可用的充值选项。
+- **认证**: 公开
+- **成功响应 (200)**:
   ```json
   [
     {
       "ID": 1,
       "AmountCNY": 50.0,
-      "Description": "50 CNY Pack",
+      "Description": "50元充值包",
       "IsEnabled": true
     }
   ]
   ```
 
 #### **`POST /recharge/create-order`**
-- **Description**: Creates a new USDT recharge order.
-- **Auth**: Required
-- **Request Body**:
+- **描述**: 创建一个新的 USDT 充值订单。
+- **认证**: 需要
+- **请求体**:
   ```json
   {
     "preset_id": 1
   }
   ```
-- **Success Response (201)**:
+- **成功响应 (201)**:
   ```json
   {
     "ID": 1,
@@ -228,15 +228,15 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /recharge/redeem`**
-- **Description**: Redeems a coupon code.
-- **Auth**: Required
-- **Request Body**:
+- **描述**: 兑换一个充值码。
+- **认证**: 需要
+- **请求体**:
   ```json
   {
     "code": "VALID-COUPON-CODE"
   }
   ```
-- **Success Response (200)**:
+- **成功响应 (200)**:
   ```json
   {
     "message": "Coupon redeemed successfully"
@@ -244,15 +244,15 @@ All portal API endpoints are prefixed with `/api/v1`.
   ```
 
 #### **`POST /recharge/generate-coupon`**
-- **Description**: Generates a new coupon from the user's balance.
-- **Auth**: Required
-- **Request Body**:
+- **描述**: 从用户余额生成一个新的充值码。
+- **认证**: 需要
+- **请求体**:
   ```json
   {
     "value": 20.0
   }
   ```
-- **Success Response (201)**:
+- **成功响应 (201)**:
   ```json
   {
     "ID": 1,
@@ -262,71 +262,71 @@ All portal API endpoints are prefixed with `/api/v1`.
   }
   ```
 
-### Other Public Endpoints
+### 其他公开接口
 
-- **`GET /nodes/status`**: Lists the status of all server nodes.
-- **`GET /announcements`**: Lists all active announcements.
-- **`GET /help-documents`**: Lists all help documents.
+- **`GET /nodes/status`**: 列出所有服务器节点的状态。
+- **`GET /announcements`**: 列出所有有效的公告。
+- **`GET /help-documents`**: 列出所有帮助文档。
 
 ---
 
-## Admin API (`admin-api`)
+## 后台管理 API (`admin-api`)
 
-All admin API endpoints are prefixed with `/api/v1/admin`. All endpoints (except `/login`) require a `Bearer Token` from an admin login.
+所有后台管理 API 接口均以 `/api/v1/admin` 为前缀。除 `/login` 外，所有接口都需要管理员登录后获得的 `Bearer Token`。
 
-### Authentication
+### 认证
 
 #### **`POST /login`**
-- **Description**: Logs in an administrator.
-- **Request Body**:
+- **描述**: 管理员登录。
+- **请求体**:
   ```json
   {
     "username": "admin",
     "password": "adminpassword"
   }
   ```
-- **Success Response (200)**:
+- **成功响应 (200)**:
   ```json
   {
     "token": "ey..."
   }
   ```
 
-### Node Management (`/nodes`)
+### 节点管理 (`/nodes`)
 
-- **`POST /`**: Creates a new node.
-- **`GET /`**: Lists all nodes.
-- **`GET /:id`**: Gets a single node by ID.
-- **`PUT /:id`**: Updates a node.
-- **`DELETE /:id`**: Deletes a node.
+- **`POST /`**: 创建一个新节点。
+- **`GET /`**: 列出所有节点。
+- **`GET /:id`**: 获取单个节点详情。
+- **`PUT /:id`**: 更新一个节点。
+- **`DELETE /:id`**: 删除一个节点。
 
-### User Management (`/users`)
+### 用户管理 (`/users`)
 
-- **`GET /`**: Lists users with pagination and search (`?email=...&page=1&page_size=20`).
-- **`PATCH /:id/status`**: Updates a user's status (e.g., `{"status": "locked"}`).
+- **`GET /`**: 列出用户，支持分页和搜索 (`?email=...&page=1&page_size=20`)。
+- **`PATCH /:id/status`**: 更新用户状态 (例如, `{"status": "locked"}`)。
 
-### Plan Management (`/plans`)
+### 套餐管理 (`/plans`)
 
-- **`POST /`**: Creates a new service plan.
-- **`GET /`**: Lists all plans.
-- **`GET /:id`**: Gets a single plan by ID.
-- **`PUT /:id`**: Updates a plan.
-- **`DELETE /:id`**: Deletes a plan.
+- **`POST /`**: 创建一个新套餐。
+- **`GET /`**: 列出所有套餐。
+- **`GET /:id`**: 获取单个套餐详情。
+- **`PUT /:id`**: 更新一个套餐。
+- **`DELETE /:id`**: 删除一个套餐。
 
-### Order Management (`/orders`)
+### 订单管理 (`/orders`)
 
-- **`GET /recharge`**: Lists recharge orders with pagination.
-- **`GET /subscription`**: Lists subscription orders with pagination.
+- **`GET /recharge`**: 分页列出充值订单。
+- **`GET /subscription`**: 分页列出订阅订单。
 
-### Content Management (`/content`)
+### 内容管理 (`/content`)
 
-- **`POST /announcements`**: Creates a new announcement.
-- **`PUT /announcements/:id`**: Updates an announcement.
-- **`DELETE /announcements/:id`**: Deletes an announcement.
-- **`POST /help-documents`**: Creates a new help document.
-- **`PUT /help-documents/:id`**: Updates a help document.
-- **`DELETE /help-documents/:id`**: Deletes a help document.
+- **`POST /announcements`**: 创建新公告。
+- **`PUT /announcements/:id`**: 更新公告。
+- **`DELETE /announcements/:id`**: 删除公告。
+- **`POST /help-documents`**: 创建新帮助文档。
+- **`PUT /help-documents/:id`**: 更新帮助文档。
+- **`DELETE /help-documents/:id`**: 删除帮助文档。
 
-### Audit (`/audit`)
+### 资金审计 (`/audit`)
 
-- **`GET /financial-overview`**: Gets a financial overview of the platform.
+- **`GET /financial-overview`**: 获取平台资金总览。

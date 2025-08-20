@@ -1,67 +1,67 @@
-# Deployment Guide
+# 部署指南
 
-This document provides instructions on how to build and run the entire V2Ray SaaS application stack using Docker and Docker Compose.
+本文档提供了使用 Docker 和 Docker Compose 构建并运行整个 V2Ray SaaS 应用的技术栈的说明。
 
-## Prerequisites
+## 系统要求
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-Ensure that both Docker and Docker Compose are installed on your system and that the Docker daemon is running.
+请确保您的系统上已安装 Docker 和 Docker Compose，并且 Docker 守护进程正在运行。
 
-## Running the Application
+## 运行应用程序
 
-The entire application stack, including all Go microservices, the MySQL database, and the Redis cache, is defined in the `docker-compose.yml` file.
+整个应用程序技术栈，包括所有的 Go 微服务、MySQL 数据库和 Redis 缓存，都已在 `docker-compose.yml` 文件中定义。
 
-To build and run all services in detached mode (in the background), navigate to the project's root directory and execute the following command:
+要构建并以分离模式（在后台）运行所有服务，请导航到项目的根目录并执行以下命令：
 
 ```bash
 docker-compose up --build -d
 ```
 
-### Command Breakdown
+### 命令解析
 
-- `docker-compose up`: This is the standard command to start the services defined in the `docker-compose.yml` file.
-- `--build`: This flag forces Docker Compose to build the images for our Go services from their respective `Dockerfile`s before starting the containers. You should use this flag the first time you run the command or whenever you make changes to the source code.
-- `-d`: This flag runs the containers in detached mode, meaning they will run in the background and you will not see their logs directly in your terminal.
+- `docker-compose up`: 这是启动 `docker-compose.yml` 文件中定义的服务集的标准命令。
+- `--build`: 此标志会强制 Docker Compose 在启动容器之前，从各自的 `Dockerfile` 构建 Go 服务的镜像。当您首次运行或代码发生变更后，都应使用此标志。
+- `-d`: 此标志以分离模式运行容器，意味着它们将在后台运行，您不会在终端中直接看到它们的日志。
 
-## Verifying the Deployment
+## 验证部署状态
 
-After running the command, you can check the status of the running containers:
+运行命令后，您可以通过以下方式检查正在运行的容器的状态：
 
 ```bash
 docker-compose ps
 ```
 
-You should see all services (`db`, `redis`, `portal-api`, `admin-api`, `node-service`, `node-agent`) with a `State` of `Up`.
+您应该能看到所有服务（`db`, `redis`, `portal-api`, `admin-api`, `node-service`, `node-agent`）的状态（`State`）都为 `Up`。
 
-You can also view the logs for a specific service:
+您也可以查看特定服务的日志：
 
 ```bash
-# Example: View logs for the portal-api
+# 示例：查看 portal-api 的日志
 docker-compose logs -f portal-api
 ```
 
-## Accessing the Services
+## 访问服务
 
-Once the containers are running, the services will be accessible at the following default ports on your local machine:
+容器启动并运行后，您可以通过本地主机的以下默认端口访问各项服务：
 
-- **Portal API**: `http://localhost:8080`
-- **Admin API**: `http://localhost:8081`
-- **Node Service**: `http://localhost:8082`
-- **Node Agent**: `http://localhost:8083`
-- **MySQL Database**: `localhost:3306`
+- **门户 API**: `http://localhost:8080`
+- **后台管理 API**: `http://localhost:8081`
+- **节点服务**: `http://localhost:8082`
+- **节点代理**: `http://localhost:8083`
+- **MySQL 数据库**: `localhost:3306`
 - **Redis**: `localhost:6379`
 
-## Stopping the Application
+## 停止应用程序
 
-To stop all running services, use the following command:
+要停止所有正在运行的服务，请使用以下命令：
 
 ```bash
 docker-compose down
 ```
 
-If you also want to remove the persistent data volume for the database (this will delete all your data), you can add the `-v` flag:
+如果您还希望移除数据库的持久化数据卷（**这将删除您的所有数据**），可以添加 `-v` 标志：
 
 ```bash
 docker-compose down -v
