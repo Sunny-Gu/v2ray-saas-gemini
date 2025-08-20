@@ -19,8 +19,7 @@ func Init() {
 	// It's recommended to use environment variables for sensitive data.
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
-		dsn = "user:password@tcp(127.0.0.1:3306)/v2ray_saas?charset=utf8mb4&parseTime=True&loc=Local"
-		log.Println("Warning: DB_DSN environment variable not set. Using default DSN.")
+		log.Fatal("DB_DSN environment variable not set. Please configure it in config.yaml.")
 	}
 
 	// Open a connection to the database.

@@ -1,0 +1,16 @@
+server:
+  portal_api_port: ":8080"
+  admin_api_port: ":8081"
+  node_service_port: ":8082"
+
+database:
+  dsn: "user:password@tcp(127.0.0.1:3306)/v2ray_saas?charset=utf8mb4&parseTime=True&loc=Local"
+
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0
+
+jwt:
+  secret: "your-very-secret-key"
+  expire_hours: 72
