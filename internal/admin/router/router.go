@@ -18,6 +18,9 @@ func SetupRouter() *gin.Engine {
 	rechargeConfigHandler := handler.NewRechargeConfigHandler()
 	userManagementHandler := handler.NewUserManagementHandler()
 	planManagementHandler := handler.NewPlanManagementHandler()
+	orderHandler := handler.NewOrderHandler()
+	contentManagementHandler := handler.NewContentManagementHandler()
+	auditHandler := handler.NewAuditHandler()
 
 	// API v1 group for admin
 	apiV1 := router.Group("/api/v1/admin")

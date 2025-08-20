@@ -68,11 +68,12 @@ func (s *StoreService) PurchasePlan(userID uint, input PurchasePlanInput) (*mode
 	}
 
 	// 5. Create the new subscription
+	now := time.Now()
 	newSubscription := models.Subscription{
 		UserID:         userID,
 		PlanID:         plan.ID,
-		StartedAt:      time.Now(),
-		ExpiredAt:      time.Now().AddDate(0, 0, plan.DurationDays),
+		StartedAt:      &now,
+		ExpiredAt:      now.AddDate(0, 0, plan.DurationDays),
 		TotalTrafficGB: plan.TrafficGB,
 		UsedTrafficGB:  0,
 		Status:         models.SubStatusActive,
