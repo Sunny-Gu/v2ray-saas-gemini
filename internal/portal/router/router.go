@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"v2ray-saas-gemini/internal/portal/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,16 +19,16 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
+	// Create handlers
+	userHandler := handler.NewUserHandler()
+
 	// Group API routes under /api/v1
 	apiV1 := router.Group("/api/v1")
 	{
 		// User routes
 		userRoutes := apiV1.Group("/user")
 		{
-			// Placeholder for user registration
-			userRoutes.POST("/register", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{"message": "register endpoint"})
-			})
+			userRoutes.POST("/register", userHandler.Register)
 			// Placeholder for user login
 			userRoutes.POST("/login", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{"message": "login endpoint"})
