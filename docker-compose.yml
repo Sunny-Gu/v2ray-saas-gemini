@@ -11,9 +11,79 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3306:3306"
+      - "3306:3306" # Expose to host for debugging
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - v2ray-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: v2ray-saas-redis
+    restart: always
+    ports:
+      - "6379:6379" # Expose to host for debugging
+    networks:
+      - v2ray-net
+
+  portal-api:
+    build:
+      context: .
+      dockerfile: portal-api.Dockerfile
+    container_name: v2ray-portal-api
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8080:8080"
+    networks:
+      - v2ray-net
+
+  admin-api:
+    build:
+      context: .
+      dockerfile: admin-api.Dockerfile
+    container_name: v2ray-admin-api
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8081:8081"
+    networks:
+      - v2ray-net
+
+  node-service:
+    build:
+      context: .
+      dockerfile: node-service.Dockerfile
+    container_name: v2ray-node-service
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8082:8082"
+    networks:
+      - v2ray-net
+
+  node-agent:
+    build:
+      context: .
+      dockerfile: node-agent.Dockerfile
+    container_name: v2ray-node-agent
+    restart: always
+    depends_on:
+      - node-service
+    ports:
+      - "8083:8083"
+    networks:
+      - v2ray-net
 
 volumes:
   db_data:
+
+networks:
+  v2ray-net:
+    driver: bridge
