@@ -51,7 +51,7 @@ type Subscription struct {
 	UserID         uint                   `gorm:"not null;index"`
 	User           User                   // Belongs to User
 	PlanID         uint                   `gorm:"not null"` // Foreign key to a Plan model (to be created)
-	StartedAt      time.Time
+	StartedAt      *time.Time
 	ExpiredAt      time.Time
 	TotalTrafficGB float64                `gorm:"type:decimal(10,2);not null"`
 	UsedTrafficGB  float64                `gorm:"type:decimal(10,2);not null;default:0.00"`
