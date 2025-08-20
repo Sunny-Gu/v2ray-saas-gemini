@@ -14,3 +14,11 @@ redis:
 jwt:
   secret: "your-very-secret-key"
   expire_hours: 72
+
+recharge:
+  # CNY to USDT exchange rate. e.g., 7.2 means 1 USDT = 7.2 CNY
+  exchange_rate: 7.2
+  # Discount rate. e.g., 0.8 means user pays 80% of original price in USDT
+  discount_rate: 0.8
+  # Default USDT TRC20 payment address
+  payment_address: "TYourTRC20AddressHere"

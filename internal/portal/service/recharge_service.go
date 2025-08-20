@@ -71,3 +71,59 @@ func (s *RechargeService) RedeemCoupon(userID uint, input RedeemCouponInput) err
 
 	return nil
 }
+
+// ListRechargePresets lists all enabled recharge presets.
+func (s *RechargeService) ListRechargePresets() ([]models.RechargePreset, error) {
+	var presets []models.RechargePreset
+	if err := database.DB.Where("is_enabled = ?", true).Order("sort_order asc").Find(&presets).Error; err != nil {
+		return nil, err
+	}
+	return presets, nil
+}
+
+// CreateUSDTOrderInput defines the input for creating a USDT recharge order.
+type CreateUSDTOrderInput struct {
+	PresetID uint `json:"preset_id" binding:"required"`
+}
+
+// CreateUSDTOrder creates a new recharge order based on a selected preset.
+func (s *RechargeService) CreateUSDTOrder(userID uint, input CreateUSDTOrderInput) (*models.RechargeOrder, error) {
+	// 1. Get the preset details
+	var preset models.RechargePreset
+	if err := database.DB.First(&preset, input.PresetID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("recharge preset not found")
+		}
+		return nil, err
+	}
+
+	// 2. Get global recharge config
+	rate := config.Cfg.Recharge.ExchangeRate
+	discount := config.Cfg.Recharge.DiscountRate
+	address := config.Cfg.Recharge.PaymentAddress
+
+	if rate <= 0 {
+		return nil, errors.New("exchange rate is not configured correctly")
+	}
+
+	// 3. Calculate the required USDT amount
+	// Formula: USDT = (AmountCNY * DiscountRate) / ExchangeRate
+	paidUSDT := (preset.AmountCNY * discount) / rate
+
+	// 4. Create the recharge order
+	order := models.RechargeOrder{
+		UserID:         userID,
+		AmountCNY:      preset.AmountCNY,
+		DiscountRate:   discount,
+		PaidUSDT:       paidUSDT,
+		ExchangeRate:   rate,
+		PaymentAddress: address,
+		Status:         models.OrderStatusPending,
+	}
+
+	if err := database.DB.Create(&order).Error; err != nil {
+		return nil, errors.New("failed to create recharge order")
+	}
+
+	return &order, nil
+}

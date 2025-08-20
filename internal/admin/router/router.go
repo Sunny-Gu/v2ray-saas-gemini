@@ -13,6 +13,7 @@ func SetupRouter() *gin.Engine {
 
 	// Handlers
 	nodeHandler := handler.NewNodeHandler()
+	rechargeConfigHandler := handler.NewRechargeConfigHandler()
 
 	// API v1 group for admin
 	apiV1 := router.Group("/api/v1/admin")
@@ -34,6 +35,15 @@ func SetupRouter() *gin.Engine {
 			nodeRoutes.GET("/:id", nodeHandler.GetNode)
 			nodeRoutes.PUT("/:id", nodeHandler.UpdateNode)
 			nodeRoutes.DELETE("/:id", nodeHandler.DeleteNode)
+		}
+
+		// Recharge preset management routes
+		rechargeRoutes := apiV1.Group("/recharge-presets")
+		{
+			rechargeRoutes.POST("/", rechargeConfigHandler.CreatePreset)
+			rechargeRoutes.GET("/", rechargeConfigHandler.ListPresets)
+			rechargeRoutes.PUT("/:id", rechargeConfigHandler.UpdatePreset)
+			rechargeRoutes.DELETE("/:id", rechargeConfigHandler.DeletePreset)
 		}
 	}
 

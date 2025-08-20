@@ -37,6 +37,7 @@ func SetupRouter() *gin.Engine {
 			storeRoutes := public.Group("/store")
 			{
 				storeRoutes.GET("/plans", storeHandler.ListPlans)
+				storeRoutes.GET("/recharge-presets", rechargeHandler.ListRechargePresets)
 			}
 		}
 
@@ -54,6 +55,7 @@ func SetupRouter() *gin.Engine {
 			rechargeRoutes := authenticated.Group("/recharge")
 			{
 				rechargeRoutes.POST("/redeem", rechargeHandler.RedeemCoupon)
+				rechargeRoutes.POST("/create-order", rechargeHandler.CreateUSDTOrder)
 			}
 
 			// Store routes (for purchasing)

@@ -42,6 +42,7 @@ func Init() {
 		&models.NodeTraffic{},
 		&models.Plan{},
 		&models.Coupon{},
+		&models.RechargePreset{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database schema: %v", err)

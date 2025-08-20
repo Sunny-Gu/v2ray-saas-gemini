@@ -43,3 +43,33 @@ func (h *RechargeHandler) RedeemCoupon(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Coupon redeemed successfully"})
 }
+
+// ListRechargePresets handles the request to list available recharge presets.
+func (h *RechargeHandler) ListRechargePresets(c *gin.Context) {
+	presets, err := h.rechargeService.ListRechargePresets()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve recharge presets"})
+		return
+	}
+	c.JSON(http.StatusOK, presets)
+}
+
+// CreateUSDTOrder handles the request to create a new USDT recharge order.
+func (h *RechargeHandler) CreateUSDTOrder(c *gin.Context) {
+	var input service.CreateUSDTOrderInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userID, _ := c.Get("userID")
+	id, _ := userID.(uint)
+
+	order, err := h.rechargeService.CreateUSDTOrder(id, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, order)
+}
