@@ -14,6 +14,7 @@ func SetupRouter() *gin.Engine {
 	// Handlers
 	nodeHandler := handler.NewNodeHandler()
 	rechargeConfigHandler := handler.NewRechargeConfigHandler()
+	userManagementHandler := handler.NewUserManagementHandler()
 
 	// API v1 group for admin
 	apiV1 := router.Group("/api/v1/admin")
@@ -44,6 +45,13 @@ func SetupRouter() *gin.Engine {
 			rechargeRoutes.GET("/", rechargeConfigHandler.ListPresets)
 			rechargeRoutes.PUT("/:id", rechargeConfigHandler.UpdatePreset)
 			rechargeRoutes.DELETE("/:id", rechargeConfigHandler.DeletePreset)
+		}
+
+		// User management routes
+		userRoutes := apiV1.Group("/users")
+		{
+			userRoutes.GET("/", userManagementHandler.ListUsers)
+			userRoutes.PATCH("/:id/status", userManagementHandler.UpdateUserStatus)
 		}
 	}
 
