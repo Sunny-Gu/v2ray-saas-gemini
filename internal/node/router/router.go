@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"v2ray-saas-gemini/internal/node/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,6 +10,9 @@ import (
 // SetupRouter initializes and configures the Gin router for the node service.
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+
+	// Handlers
+	nodeApiHandler := handler.NewNodeApiHandler()
 
 	// Here we would add a middleware for authenticating requests from v2ray nodes,
 	// likely using a pre-shared secret key.
@@ -18,9 +22,7 @@ func SetupRouter() *gin.Engine {
 	apiV1 := router.Group("/api/v1/node")
 	{
 		// Endpoint for v2ray nodes to fetch user configurations
-		apiV1.GET("/users", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "user config endpoint"})
-		})
+		apiV1.GET("/users", nodeApiHandler.GetActiveUsers)
 
 		// Endpoint for v2ray nodes to report traffic usage
 		apiV1.POST("/traffic", func(c *gin.Context) {
