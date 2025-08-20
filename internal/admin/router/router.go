@@ -78,6 +78,27 @@ func SetupRouter() *gin.Engine {
 				orderRoutes.GET("/recharge", orderHandler.ListRechargeOrders)
 				orderRoutes.GET("/subscription", orderHandler.ListSubscriptionOrders)
 			}
+
+			// Content management routes
+			contentRoutes := authRequired.Group("/content")
+			{
+				// Announcements
+				contentRoutes.POST("/announcements", contentManagementHandler.CreateAnnouncement)
+				contentRoutes.GET("/announcements", contentManagementHandler.ListAnnouncements)
+				contentRoutes.PUT("/announcements/:id", contentManagementHandler.UpdateAnnouncement)
+				contentRoutes.DELETE("/announcements/:id", contentManagementHandler.DeleteAnnouncement)
+				// Help Documents
+				contentRoutes.POST("/help-documents", contentManagementHandler.CreateHelpDocument)
+				contentRoutes.GET("/help-documents", contentManagementHandler.ListHelpDocuments)
+				contentRoutes.PUT("/help-documents/:id", contentManagementHandler.UpdateHelpDocument)
+				contentRoutes.DELETE("/help-documents/:id", contentManagementHandler.DeleteHelpDocument)
+			}
+
+			// Audit routes
+			auditRoutes := authRequired.Group("/audit")
+			{
+				auditRoutes.GET("/financial-overview", auditHandler.GetFinancialOverview)
+			}
 		}
 	}
 
