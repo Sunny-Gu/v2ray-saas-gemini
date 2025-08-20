@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"v-ray-saas-gemini/internal/portal/service"
+	"v2ray-saas-gemini/internal/portal/service"
 
 	"github.com/gin-gonic/gin"
 )

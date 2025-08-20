@@ -2,8 +2,8 @@ package service
 
 import (
 	"errors"
-	"v-ray-saas-gemini/internal/database"
-	"v-ray-saas-gemini/internal/models"
+	"v2ray-saas-gemini/internal/database"
+	"v2ray-saas-gemini/internal/models"
 
 	"gorm.io/gorm"
 )

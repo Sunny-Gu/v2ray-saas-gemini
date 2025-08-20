@@ -22,7 +22,7 @@ type User struct {
 	Email        string         `gorm:"type:varchar(255);uniqueIndex;not null"`
 	PasswordHash string         `gorm:"type:varchar(255);not null"`
 	Status       UserStatusType `gorm:"type:varchar(20);default:'unverified'"`
-	LastLoginAt  time.Time
+	LastLoginAt  *time.Time
 	IPWhitelist  string `gorm:"type:text"` // Store as comma-separated string or JSON
 }
 
