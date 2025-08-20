@@ -3,33 +3,43 @@ package router
 import (
 	"net/http"
 	"v2ray-saas-gemini/internal/portal/handler"
+	"v2ray-saas-gemini/internal/portal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRouter initializes and configures the Gin router.
 func SetupRouter() *gin.Engine {
-	// Create a new Gin router with default middleware (logger, recovery).
 	router := gin.Default()
 
-	// Health check endpoint
+	// Health check
 	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
-	// Create handlers
+	// Handlers
 	userHandler := handler.NewUserHandler()
+	profileHandler := handler.NewProfileHandler()
 
-	// Group API routes under /api/v1
+	// API v1 group
 	apiV1 := router.Group("/api/v1")
 	{
-		// User routes
-		userRoutes := apiV1.Group("/user")
+		// Public routes (no authentication required)
+		public := apiV1.Group("/user")
 		{
-			userRoutes.POST("/register", userHandler.Register)
-			userRoutes.POST("/login", userHandler.Login)
+			public.POST("/register", userHandler.Register)
+			public.POST("/login", userHandler.Login)
+		}
+
+		// Authenticated routes
+		authenticated := apiV1.Group("/")
+		authenticated.Use(middleware.AuthMiddleware())
+		{
+			// Profile routes
+			profileRoutes := authenticated.Group("/profile")
+			{
+				profileRoutes.GET("/", profileHandler.GetProfile)
+			}
 		}
 	}
 
