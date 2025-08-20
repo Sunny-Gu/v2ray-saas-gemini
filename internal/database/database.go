@@ -44,6 +44,10 @@ func Init() {
 		&models.Coupon{},
 		&models.RechargePreset{},
 		&models.PasswordResetToken{},
+		&models.Ticket{},
+		&models.TicketReply{},
+		&models.Announcement{},
+		&models.HelpDocument{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to migrate database schema: %v", err)

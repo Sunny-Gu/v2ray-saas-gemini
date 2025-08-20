@@ -23,6 +23,9 @@ func SetupRouter() *gin.Engine {
 	rechargeHandler := handler.NewRechargeHandler()
 	storeHandler := handler.NewStoreHandler()
 	subscriptionHandler := handler.NewSubscriptionHandler()
+	nodeStatusHandler := handler.NewNodeStatusHandler()
+	ticketHandler := handler.NewTicketHandler()
+	contentHandler := handler.NewContentHandler()
 
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -42,6 +45,11 @@ func SetupRouter() *gin.Engine {
 				storeRoutes.GET("/plans", storeHandler.ListPlans)
 				storeRoutes.GET("/recharge-presets", rechargeHandler.ListRechargePresets)
 			}
+			// Public node status route
+			public.GET("/nodes/status", nodeStatusHandler.ListAllNodeStatuses)
+			// Public content routes
+			public.GET("/announcements", contentHandler.ListAnnouncements)
+			public.GET("/help-documents", contentHandler.ListHelpDocuments)
 		}
 
 		// Authenticated routes
@@ -74,6 +82,15 @@ func SetupRouter() *gin.Engine {
 			{
 				subscriptionRoutes.GET("/", subscriptionHandler.GetSubscriptionInfo)
 				subscriptionRoutes.POST("/reset-link", subscriptionHandler.ResetSubscriptionLink)
+			}
+
+			// Ticket routes
+			ticketRoutes := authenticated.Group("/tickets")
+			{
+				ticketRoutes.POST("/", ticketHandler.CreateTicket)
+				ticketRoutes.GET("/", ticketHandler.ListUserTickets)
+				ticketRoutes.GET("/:id", ticketHandler.GetTicketDetails)
+				ticketRoutes.POST("/:id/reply", ticketHandler.ReplyToTicket)
 			}
 		}
 	}
