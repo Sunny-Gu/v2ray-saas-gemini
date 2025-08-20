@@ -26,7 +26,7 @@ type Node struct {
 	Location     string         `gorm:"type:varchar(100)"`
 	Weight       int            `gorm:"default:100"`
 	Status       NodeStatusType `gorm:"type:varchar(20);default:'offline'"`
-	LastCheckAt  time.Time
+	LastCheckAt  *time.Time
 }
 
 // NodeTraffic records the traffic usage for a user on a specific node
