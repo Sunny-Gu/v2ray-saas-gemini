@@ -77,7 +77,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /profile/:
+  /profile:
     get:
       tags:
         - Portal - Profile

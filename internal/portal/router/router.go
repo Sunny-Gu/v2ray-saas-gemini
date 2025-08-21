@@ -59,7 +59,7 @@ func SetupRouter() *gin.Engine {
 			// Profile routes
 			profileRoutes := authenticated.Group("/profile")
 			{
-				profileRoutes.GET("/", profileHandler.GetProfile)
+				profileRoutes.GET("", profileHandler.GetProfile)
 				profileRoutes.GET("/history", profileHandler.GetConsumptionHistory)
 			}
 
