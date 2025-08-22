@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"v2ray-saas-gemini/internal/config"
 	"v2ray-saas-gemini/internal/models"
+	"v2ray-saas-gemini/internal/utils"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -55,4 +57,54 @@ func Init() {
 	}
 
 	fmt.Println("Database schema migrated successfully.")
+
+	// Create default admin if not exists
+	createDefaultAdmin()
+}
+
+// createDefaultAdmin creates a default admin account if it doesn't exist
+func createDefaultAdmin() {
+	// Check if admin configuration is provided
+	if config.Cfg.Admin.Username == "" || config.Cfg.Admin.Password == "" {
+		log.Println("Admin configuration not provided, skipping default admin creation")
+		return
+	}
+
+	// Check if admin already exists
+	var existingAdmin models.Admin
+	if err := DB.Where("username = ?", config.Cfg.Admin.Username).First(&existingAdmin).Error; err == nil {
+		log.Printf("Admin user '%s' already exists, skipping creation", config.Cfg.Admin.Username)
+		return
+	} else if err != gorm.ErrRecordNotFound {
+		log.Printf("Error checking for existing admin: %v", err)
+		return
+	}
+
+	// Hash the password
+	hashedPassword, err := utils.HashPassword(config.Cfg.Admin.Password)
+	if err != nil {
+		log.Printf("Failed to hash admin password: %v", err)
+		return
+	}
+
+	// Set default role if not provided
+	role := config.Cfg.Admin.Role
+	if role == "" {
+		role = "admin"
+	}
+
+	// Create admin account
+	admin := models.Admin{
+		Username:     config.Cfg.Admin.Username,
+		PasswordHash: hashedPassword,
+		Role:         role,
+		IsActive:     true,
+	}
+
+	if err := DB.Create(&admin).Error; err != nil {
+		log.Printf("Failed to create default admin: %v", err)
+		return
+	}
+
+	log.Printf("Default admin user '%s' created successfully", config.Cfg.Admin.Username)
 }

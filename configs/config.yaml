@@ -4,8 +4,8 @@ server:
   node_service_port: ":8082"
 
 database:
-  # Use the service name 'db' from docker-compose as the hostname
-  dsn: "user:password@tcp(db:3306)/v2ray_saas?charset=utf8mb4&parseTime=True&loc=Local"
+  # Use localhost for local development, or service name 'db' for docker-compose
+  dsn: "root:password@tcp(localhost:3306)/v2ray_saas?charset=utf8mb4&parseTime=True&loc=Local"
 
 redis:
   # Use the service name 'redis' from docker-compose as the hostname
@@ -24,3 +24,9 @@ recharge:
   discount_rate: 0.8
   # Default USDT TRC20 payment address
   payment_address: "TYourTRC20AddressHere"
+
+admin:
+  # Default admin account configuration
+  username: "admin"
+  password: "admin123"
+  role: "superadmin"

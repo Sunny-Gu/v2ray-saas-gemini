@@ -30,6 +30,11 @@ type AppConfig struct {
 		DiscountRate   float64 `mapstructure:"discount_rate"`
 		PaymentAddress string  `mapstructure:"payment_address"`
 	} `mapstructure:"recharge"`
+	Admin struct {
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+		Role     string `mapstructure:"role"`
+	} `mapstructure:"admin"`
 }
 
 // Cfg is the global configuration object.
